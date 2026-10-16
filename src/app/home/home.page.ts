@@ -6,7 +6,8 @@ import {
 import {
   IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem,
   IonInput, IonSelect, IonSelectOption, IonButton, IonSpinner, IonNote,
-  ToastController
+  ToastController, AlertController
+  
 } from '@ionic/angular';
 
 /** Validador personalizado: el SKU debe tener exactamente 12 caracteres alfanuméricos */
@@ -17,6 +18,18 @@ export function skuValidator(): ValidatorFn {
     return /^[A-Za-z0-9]{12}$/.test(valor) ? null : { skuInvalido: true };
   };
 }
+/** Validador personalizado: la fecha de nacimiento no puede ser futura */
+export function fechaNacimientoValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const valor = control.value;
+    if (!valor) return null; // el "required" ya se encarga del campo vacío
+    const fecha = new Date(valor);
+    if (isNaN(fecha.getTime())) return { fechaInvalida: true };
+    if (fecha > new Date()) return { fechaFutura: true };
+    return null;
+  };
+}
+
 
 @Component({
   selector: 'app-home',
@@ -31,6 +44,10 @@ export function skuValidator(): ValidatorFn {
 export class HomePage {
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
+  private alertCtrl = inject(AlertController);
+  /** Fecha de hoy (AAAA-MM-DD) para no permitir fechas futuras en el calendario */
+  hoy = new Date().toISOString().split('T')[0];
+
 
   categorias = ['Electrónica', 'Herramientas', 'Consumibles'];
 
@@ -46,6 +63,8 @@ export class HomePage {
       Validators.min(1),
       Validators.pattern(/^[0-9]+$/)
     ]],
+     fechaNacimiento: ['', [Validators.required, fechaNacimientoValidator()]],
+
   });
 
   /** Mensaje de error dinámico del SKU */
@@ -55,6 +74,15 @@ export class HomePage {
     if (c.hasError('skuInvalido')) return 'Debe tener exactamente 12 caracteres alfanuméricos (sin espacios ni símbolos).';
     return '';
   }
+  /** Mensaje de error dinámico de la fecha de nacimiento */
+  get fechaError(): string {
+    const c = this.productoForm.controls.fechaNacimiento;
+    if (c.hasError('required')) return 'La fecha de nacimiento es obligatoria.';
+    if (c.hasError('fechaInvalida')) return 'Introduce una fecha válida.';
+    if (c.hasError('fechaFutura')) return 'La fecha de nacimiento no puede ser futura.';
+    return '';
+  }
+
 
   /** Mensaje de error dinámico del stock */
   get stockError(): string {
@@ -86,7 +114,7 @@ export class HomePage {
       localStorage.setItem('productos', JSON.stringify(guardados));
 
       this.productoForm.reset();
-      await this.mostrarToast('Producto guardado localmente', 'success');
+       await this.mostrarAlerta();
     } catch (error) {
       console.error('Error al guardar', error);
       await this.mostrarToast('Error al guardar el producto', 'danger');
@@ -94,6 +122,15 @@ export class HomePage {
       this.productoForm.enable();
       this.isSubmitting.set(false);
     }
+  }
+  /** Alerta que confirma al usuario que el formulario se ha enviado */
+  private async mostrarAlerta(): Promise<void> {
+    const alert = await this.alertCtrl.create({
+      header: 'Formulario enviado',
+      message: 'El formulario se ha enviado correctamente.',
+      buttons: ['Aceptar'],
+    });
+    await alert.present();
   }
 
   private async mostrarToast(mensaje: string, color: 'success' | 'danger'): Promise<void> {

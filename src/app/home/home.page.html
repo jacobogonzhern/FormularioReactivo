@@ -65,6 +65,18 @@
           [errorText]="stockError">
         </ion-input>
       </ion-item>
+      <!-- Fecha de nacimiento -->
+      <ion-item>
+        <ion-input
+          label="Fecha de nacimiento"
+          labelPlacement="stacked"
+          type="date"
+          [max]="hoy"
+          formControlName="fechaNacimiento"
+          [errorText]="fechaError">
+        </ion-input>
+      </ion-item>
+
 
     </ion-list>
 
