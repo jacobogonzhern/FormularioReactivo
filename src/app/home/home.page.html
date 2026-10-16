@@ -1,20 +1,79 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Alta de producto</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+  <form [formGroup]="productoForm" (ngSubmit)="onSubmit()" novalidate>
+    <ion-list lines="full">
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-  </div>
+      <!-- SKU -->
+      <ion-item>
+        <ion-input
+          label="Código de barras (SKU)"
+          labelPlacement="floating"
+          type="text"
+          maxlength="12"
+          [counter]="true"
+          autocapitalize="characters"
+          formControlName="sku"
+          helperText="12 caracteres alfanuméricos"
+          [errorText]="skuError">
+        </ion-input>
+      </ion-item>
+
+      <!-- Nombre -->
+      <ion-item>
+        <ion-input
+          label="Nombre del producto"
+          labelPlacement="floating"
+          type="text"
+          formControlName="nombre"
+          errorText="El nombre del producto es obligatorio.">
+        </ion-input>
+      </ion-item>
+
+      <!-- Categoría -->
+      <ion-item>
+        <ion-select
+          label="Categoría"
+          labelPlacement="floating"
+          placeholder="Selecciona una categoría"
+          interface="action-sheet"
+          formControlName="categoria">
+          @for (cat of categorias; track cat) {
+            <ion-select-option [value]="cat">{{ cat }}</ion-select-option>
+          }
+        </ion-select>
+      </ion-item>
+      @if (productoForm.controls.categoria.invalid && productoForm.controls.categoria.touched) {
+        <ion-note color="danger" class="error-select" role="alert">
+          Selecciona una categoría.
+        </ion-note>
+      }
+
+      <!-- Stock mínimo (teclado numérico) -->
+      <ion-item>
+        <ion-input
+          label="Stock mínimo"
+          labelPlacement="floating"
+          type="number"
+          inputmode="numeric"
+          min="1"
+          formControlName="stockMinimo"
+          [errorText]="stockError">
+        </ion-input>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="isSubmitting()">
+      @if (isSubmitting()) {
+        <ion-spinner name="crescent" aria-label="Guardando"></ion-spinner>
+      } @else {
+        Guardar producto
+      }
+    </ion-button>
+  </form>
 </ion-content>
