@@ -1,0 +1,11 @@
+/* Diseño responsive: en móvil ocupa todo el ancho y en pantallas grandes se centra */
+.contenedor {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.error-select {
+  display: block;
+  font-size: 12px;
+  padding: 4px 16px 0;
+}

@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Registro</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/driven">Driven</ion-button>
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="contenedor">
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" novalidate>
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <!-- SKU -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Código de barras (SKU)" labelPlacement="floating" type="text"
+                maxlength="12" [counter]="true" autocapitalize="characters" formControlName="sku"
+                helperText="12 caracteres alfanuméricos" [errorText]="skuError">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Nombre -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Nombre del producto" labelPlacement="floating" type="text"
+                formControlName="nombre" errorText="El nombre del producto es obligatorio.">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Categoría -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-select label="Categoría" labelPlacement="floating" placeholder="Selecciona una categoría"
+                interface="action-sheet" formControlName="categoria">
+                @for (cat of categorias; track cat) {
+                  <ion-select-option [value]="cat">{{ cat }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+            @if (registroForm.controls.categoria.invalid && registroForm.controls.categoria.touched) {
+              <ion-note color="danger" class="error-select" role="alert">Selecciona una categoría.</ion-note>
+            }
+          </ion-col>
+
+          <!-- Stock mínimo -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Stock mínimo" labelPlacement="floating" type="number" inputmode="numeric"
+                min="1" formControlName="stockMinimo" [errorText]="stockError">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Fecha de nacimiento -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Fecha de nacimiento" labelPlacement="stacked" type="date" [max]="hoy"
+                formControlName="fechaNacimiento" [errorText]="fechaError">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Contraseña -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Contraseña" labelPlacement="floating" type="password"
+                autocomplete="new-password" formControlName="password" [errorText]="passwordError">
+                <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+              </ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-button expand="block" type="submit" class="ion-margin-top" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          <ion-spinner name="crescent" aria-label="Guardando"></ion-spinner>
+        } @else {
+          Enviar formulario
+        }
+      </ion-button>
+
+      @if (ultimoEnvio()) {
+        <ion-button expand="block" fill="outline" type="button" class="ion-margin-top" (click)="descargarPdf()">
+          Descargar PDF del último envío
+        </ion-button>
+      }
+    </form>
+  </div>
+</ion-content>

@@ -1,0 +1,99 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>Driven</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/registro">Reactive</ion-button>
+      <app-dark-mode-toggle></app-dark-mode-toggle>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="contenedor">
+    <form #form="ngForm" (ngSubmit)="onSubmit(form)" novalidate>
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <!-- SKU: validación con atributos HTML (required + pattern) -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Código de barras (SKU)" labelPlacement="floating" type="text"
+                name="sku" [(ngModel)]="modelo.sku" #sku="ngModel"
+                required pattern="^[A-Za-z0-9]{12}$" maxlength="12" [counter]="true"
+                [disabled]="isSubmitting()" helperText="12 caracteres alfanuméricos"
+                [errorText]="sku.errors?.['required'] ? 'El código SKU es obligatorio.' : 'Debe tener exactamente 12 caracteres alfanuméricos (sin espacios ni símbolos).'">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Nombre -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Nombre del producto" labelPlacement="floating" type="text"
+                name="nombre" [(ngModel)]="modelo.nombre" required [disabled]="isSubmitting()"
+                errorText="El nombre del producto es obligatorio.">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Categoría -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-select label="Categoría" labelPlacement="floating" placeholder="Selecciona una categoría"
+                interface="action-sheet" name="categoria" [(ngModel)]="modelo.categoria" #categoria="ngModel"
+                required [disabled]="isSubmitting()">
+                @for (cat of categorias; track cat) {
+                  <ion-select-option [value]="cat">{{ cat }}</ion-select-option>
+                }
+              </ion-select>
+            </ion-item>
+            @if (categoria.invalid && categoria.touched) {
+              <ion-note color="danger" class="error-select" role="alert">Selecciona una categoría.</ion-note>
+            }
+          </ion-col>
+
+          <!-- Stock mínimo -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Stock mínimo" labelPlacement="floating" type="number" inputmode="numeric"
+                name="stockMinimo" [(ngModel)]="modelo.stockMinimo" #stock="ngModel"
+                required pattern="^[1-9][0-9]*$" [disabled]="isSubmitting()"
+                [errorText]="stock.errors?.['required'] ? 'El stock mínimo es obligatorio.' : 'Debe ser un número entero mayor que 0.'">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Fecha de nacimiento: validador personalizado como directiva -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Fecha de nacimiento" labelPlacement="stacked" type="date" [max]="hoy"
+                name="fechaNacimiento" [(ngModel)]="modelo.fechaNacimiento" #fecha="ngModel"
+                required appFechaNoFutura [disabled]="isSubmitting()"
+                [errorText]="fecha.errors?.['required'] ? 'La fecha de nacimiento es obligatoria.' : 'La fecha de nacimiento no puede ser superior a hoy.'">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+
+          <!-- Contraseña -->
+          <ion-col size="12" size-md="6">
+            <ion-item>
+              <ion-input label="Contraseña" labelPlacement="floating" type="password" autocomplete="new-password"
+                name="password" [(ngModel)]="modelo.password" #password="ngModel"
+                required minlength="8" [disabled]="isSubmitting()"
+                [errorText]="password.errors?.['required'] ? 'La contraseña es obligatoria.' : 'La contraseña debe tener al menos 8 caracteres.'">
+                <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+              </ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-button expand="block" color="tertiary" type="submit" class="ion-margin-top" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          <ion-spinner name="crescent" aria-label="Guardando"></ion-spinner>
+        } @else {
+          Enviar formulario
+        }
+      </ion-button>
+    </form>
+  </div>
+</ion-content>
